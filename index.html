@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>妈咪的菜谱 🍲</title>
+    <style>
+        /* 极简主义、干净、文创风格设计 */
+        :root {
+            --bg-color: #FAFAFA;
+            --card-bg: #FFFFFF;
+            --text-main: #2D2D2D;
+            --text-sub: #8E8E93;
+            --accent: #8A2BE2; /* 优雅的粉紫色调 */
+            --accent-light: #F3E6FF;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px 20px 80px 20px; /* 底部留出导航栏空间 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 480px;
+            margin: 20px 0 25px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        /* 页面切换控制 */
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 菜谱容器 */
+        .menu-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 极简风菜谱卡片 */
+        .recipe-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s;
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background-color: #EEE;
+        }
+
+        .recipe-content {
+            padding: 20px;
+        }
+
+        .recipe-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .recipe-tag {
+            display: inline-block;
+            font-size: 11px;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .recipe-details {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .order-btn {
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .order-btn:active {
+            opacity: 0.8;
+        }
+
+        /* 首页今日菜单画板 */
+        .today-box {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.01);
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 8px;
+            border-bottom: 1px dashed #F2F2F7;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .dish-badge {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-badge {
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .empty-tips {
+            color: var(--text-sub);
+            font-size: 14px;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        /* 文创极简底部导航栏 */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 90;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-sub);
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 45%;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* 极简弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .member-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 260px;
+            overflow-y: auto; /* 名字多时支持滚动 */
+            padding-right: 4px;
+        }
+
+        .member-label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #E5E5EA;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .member-label input {
+            margin-right: 12px;
+            accent-color: var(--accent);
+            width: 18px;
+            height: 18px;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cancel-btn {
+            flex: 1;
+            background: #E5E5EA;
+            color: var(--text-main);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 id="pageTitle">今日菜单 🏠</h1>
+        <p>好好做饭，好好吃饭，是给家里最温暖的浪漫</p>
+    </header>
+
+    <div class="page active" id="homePage">
+        <div class="today-box">
+            <div id="orderList">
+                <div class="empty-tips">正在帮您看厨房的大账本... 🍳</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="menuPage">
+        <div class="menu-container">
+            <div class="recipe-card">
+                <img class="recipe-image" src="https://a1.ax1x.com/2026/07/06/FmWyZ.png" alt="瓦煲上汤沙白">
+                <div class="recipe-content">
+                    <div class="recipe-title">瓦煲上汤沙白</div>
+                    <span class="recipe-tag">海鲜</span>
+                    <div class="recipe-details">
+                        <strong>配料：</strong>沙白、嫩姜、小辣椒、蒜、绍兴酒<br>
+                        <strong>做法：</strong>沙白吐沙洗净，瓦煲下油爆香姜蒜、辣椒，倒入沙白与绍兴酒，大火煮至开壳，鲜甜无比。
+                    </div>
+                    <button class="order-btn" onclick="openOrderModal('瓦煲上汤沙白')">点这道菜 🙋‍♂️</button>
+                </div>
+            </div>
+
+            <div class="recipe-card">
+                <img class="recipe-image" src="https://a1.ax1x.com/2026/07/06/FmlCc.png" alt="拍黄瓜">
+                <div class="recipe-content">
+                    <div class="recipe-title">拍黄瓜</div>
+                    <span class="recipe-tag">菜类</span>
+                    <div class="recipe-details">
+                        <strong>配料：</strong>黄瓜，蒜，花生，小辣椒，陈醋<br>
+                        <strong>做法：</strong>再更新
+                    </div>
+                    <button class="order-btn" onclick="openOrderModal('拍黄瓜')">点这道菜 🙋‍♂️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <button class="nav-item active" id="navHome" onclick="switchPage('home')">
+            <span class="nav-icon">🏠</span>
+            <span>今日菜单</span>
+        </button>
+        <button class="nav-item" id="navMenu" onclick="switchPage('menu')">
+            <span class="nav-icon">🍲</span>
+            <span>浏览点菜</span>
+        </button>
+    </nav>
+
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalDishName">你是谁？</div>
+            <div class="member-options">
+                <label class="member-label"><input type="radio" name="member" value="爸爸"> 爸爸</label>
+                <label class="member-label"><input type="radio" name="member" value="妈妈"> 妈妈</label>
+                <label class="member-label"><input type="radio" name="member" value="大姐"> 大姐</label>
+                <label class="member-label"><input type="radio" name="member" value="二姐"> 二姐</label>
+                <label class="member-label"><input type="radio" name="member" value="阿祥"> 阿祥</label>
+                <label class="member-label"><input type="radio" name="member" value="小不点"> 小不点</label>
+                <label class="member-label"><input type="radio" name="member" value="阿健"> 阿健</label>
+            </div>
+            <div class="modal-btns">
+                <button class="cancel-btn" onclick="closeModal()">取消</button>
+                <button class="order-btn" style="flex: 2;" onclick="submitOrder()">确认下单</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbymzxZFF24ZYwDYfiPt2asy5QRpJEAnXeyU4snTvK4TbCYd-IpxWE3t-sDlmHkteRk/exec';
+
+        let currentDish = '';
+
+        function switchPage(pageName) {
+            const homePage = document.getElementById('homePage');
+            const menuPage = document.getElementById('menuPage');
+            const navHome = document.getElementById('navHome');
+            const navMenu = document.getElementById('navMenu');
+            const pageTitle = document.getElementById('pageTitle');
+
+            if (pageName === 'home') {
+                homePage.classList.add('active');
+                menuPage.classList.remove('active');
+                navHome.classList.add('active');
+                navMenu.classList.remove('active');
+                pageTitle.innerText = '今日菜单 🏠';
+                fetchTodayOrders();
+            } else {
+                homePage.classList.remove('active');
+                menuPage.classList.add('active');
+                navHome.classList.remove('active');
+                navMenu.classList.add('active');
+                pageTitle.innerText = '浏览菜谱 🍲';
+            }
+        }
+
+        function openOrderModal(dishName) {
+            currentDish = dishName;
+            document.getElementById('modalDishName').innerText = `点【${dishName}】的是谁？`;
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            const radios = document.getElementsByName('member');
+            for(let r of radios) r.checked = false;
+        }
+
+        function submitOrder() {
+            const radios = document.getElementsByName('member');
+            let selectedMember = '';
+            for(let r of radios) {
+                if(r.checked) { selectedMember = r.value; break; }
+            }
+
+            if(!selectedMember) {
+                alert('请先选择你的名字哦！');
+                return;
+            }
+
+            // 获取本地精准的 YYYY-MM-DD 格式，避免时区导致的异常
+            const localDate = new Date().toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).replace(/\//g, '-');
+
+            // 发送时将本地计算好的当前日期传给后台
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `dish=${encodeURIComponent(currentDish)}&name=${encodeURIComponent(selectedMember)}&date=${encodeURIComponent(localDate)}`
+            })
+            .then(() => {
+                alert(`🎉 点菜成功！已经挂到今日菜单啦~`);
+                closeModal();
+                switchPage('home');
+            })
+            .catch(err => {
+                alert('网络有点小脾气，稍后再试吧！');
+                console.error(err);
+            });
+        }
+
+        function fetchTodayOrders() {
+            const listContainer = document.getElementById('orderList');
+            
+            // 同样带上当前的本地日期去进行精确匹配
+            const localDate = new Date().toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).replace(/\//g, '-');
+
+            fetch(GOOGLE_SCRIPT_URL + `?read=1&date=${encodeURIComponent(localDate)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        listContainer.innerHTML = '<div class="empty-tips">今天还没有人点菜哦，快去“浏览点菜”点一盘吧！✨</div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.forEach(item => {
+                        html += `
+                            <div class="order-item">
+                                <span class="dish-badge">${item.dish}</span>
+                                <span class="user-badge">${item.name}</span>
+                            </div>
+                        `;
+                    });
+                    listContainer.innerHTML = html;
+                })
+                .catch(err => {
+                    listContainer.innerHTML = '<div class="empty-tips">读取账本失败，请确认表格是否开启了“知道链接任何人可见”权限哦~</div>';
+                    console.error(err);
+                });
+        }
+
+        window.onload = function() {
+            fetchTodayOrders();
+        }
+    </script>
+</body>
+</html>
