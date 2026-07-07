@@ -190,7 +190,6 @@
         <button class="btn" onclick="openModal()">浏览点菜</button>
     </div>
 
-    <!-- 点菜弹窗 -->
     <div class="modal" id="orderModal">
         <div class="modal-content">
             <div class="modal-title">你想吃什么？</div>
@@ -211,8 +210,7 @@
             <div class="form-group">
                 <label>选择菜品：</label>
                 <div class="dish-grid" id="dish-options-container">
-                    <!-- 菜品列表会由 JavaScript 自动生成 -->
-                </div>
+                    </div>
             </div>
 
             <div class="modal-actions">
@@ -224,45 +222,44 @@
 
     <script>
         // ==========================================
-        // 🍳 核心配置①：【大厨菜单区】在这里随时加减、修改菜品和照片名字
+        // 🍳 核心配置①：【大厨菜单区】（已修复逗号丢失问题）
         // ==========================================
         const dishes = [
             { id: 1, name: '瓦煲上汤沙白', image: 'ShaBai.png' }, 
             { id: 2, name: '拍黄瓜', image: 'PaiHuangGua.png' }, 
-            { id: 3, name: '麦片虾', image: '' }, // 如果没有照片，image留空 '' 就会只显示字
-            { id: 4, name: '清蒸石斑鱼', image: '' }
-            { id: 5, name: 'ABC汤', image: '' }
-            { id: 6, name: '马来风光', image: '' }
-            { id: 7, name: '马铃薯焖猪肉', image: '' }
-            { id: 8, name: '咸蛋苦瓜', image: '' }
-            { id: 9, name: '菜干汤', image: '' }
-            { id: 11, name: '酱油鸡', image: '' }
-            { id: 12, name: '梅菜猪肉', image: '' }
-            { id: 13, name: '媽蜜虾', image: '' }
-            { id: 14, name: '咸鱼花腩煲', image: '' }
-            { id: 15, name: '媽蜜鸡', image: '' }
-            { id: 16, name: '酿豆腐', image: '' }
-            { id: 17, name: '萝卜汤', image: '' }
-            { id: 18, name: '四季豆煎蛋', image: '' }
-            { id: 19, name: '水蛋', image: '' }
-            { id: 20, name: '冬菜蒸猪肉', image: '' }
-            { id: 21, name: '榨菜丝', image: '' }
-            { id: 22, name: '土豆丝', image: '' }
-            { id: 23, name: '番茄炒蛋', image: '' }
-            { id: 24, name: '意大利面', image: '' }
-            { id: 25, name: '炸薯条', image: '' }
-            { id: 26, name: '芥菜', image: '' }
-            { id: 27, name: '老黄瓜汤', image: '' }
-            { id: 28, name: '西洋菜汤', image: '' }
-            { id: 29, name: '酱蒸非洲鱼', image: '' }
-            { id: 30, name: '沙丁鱼', image: '' }
-            { id: 31, name: '药材汤', image: '' }
+            { id: 3, name: '麦片虾', image: 'MaiPianXia' }, 
+            { id: 4, name: '清蒸石斑鱼', image: '' },
+            { id: 5, name: 'ABC汤', image: '' },
+            { id: 6, name: '马来风光', image: '' },
+            { id: 7, name: '马铃薯焖猪肉', image: '' },
+            { id: 8, name: '咸蛋苦瓜', image: '' },
+            { id: 9, name: '菜干汤', image: '' },
+            { id: 11, name: '酱油鸡', image: '' },
+            { id: 12, name: '梅菜猪肉', image: '' },
+            { id: 13, name: '媽蜜虾', image: '' },
+            { id: 14, name: '咸鱼花腩煲', image: '' },
+            { id: 15, name: '媽蜜鸡', image: '' },
+            { id: 16, name: '酿豆腐', image: '' },
+            { id: 17, name: '萝卜汤', image: '' },
+            { id: 18, name: '四季豆煎蛋', image: '' },
+            { id: 19, name: '水蛋', image: '' },
+            { id: 20, name: '冬菜蒸猪肉', image: '' },
+            { id: 21, name: '榨菜丝', image: '' },
+            { id: 22, name: '土豆丝', image: '' },
+            { id: 23, name: '番茄炒蛋', image: '' },
+            { id: 24, name: '意大利面', image: '' },
+            { id: 25, name: '炸薯条', image: '' },
+            { id: 26, name: '芥菜', image: '' },
+            { id: 27, name: '老黄瓜汤', image: '' },
+            { id: 28, name: '西洋菜汤', image: '' },
+            { id: 29, name: '酱蒸非洲鱼', image: '' },
+            { id: 30, name: '沙丁鱼', image: '' },
+            { id: 31, name: '药材汤', image: '' },
             { id: 32, name: '四大天王', image: '' }
-
         ];
 
         // ==========================================
-        // 🔗 核心配置②：【重要】请把下面这行链接，换成你自己的 Google Apps Script 网页链接！
+        // 🔗 核心配置②：Google Apps Script 链接
         // ==========================================
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbymzxZFF24ZYwDYfiPt2asy5QRpJEAnXeyU4snTvK4TbCYd-IpxWE3t-sDlmHkteRk/exec'; 
 
@@ -274,7 +271,7 @@
             fetchOrders();
         };
 
-        // 渲染可选菜品列表（安全不跑位版）
+        // 渲染可选菜品列表（带图片版）
         function renderDishOptions() {
             const container = document.getElementById('dish-options-container');
             container.innerHTML = '';
@@ -283,10 +280,10 @@
                 div.className = 'dish-option';
                 
                 // 1. 判断是否有图片
-                const imgHtml = dish.image ? `<img src="${dish.image}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">` : '';
+                const imgHtml = dish.image ? `<img src="${dish.image}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">` : '';
                 
                 // 2. 拼接 HTML 结构
-                div.innerHTML = imgHtml + '<div>' + dish.name + '</div>';
+                div.innerHTML = `${imgHtml}<div>${dish.name}</div>`;
                 
                 div.onclick = function() {
                     document.querySelectorAll('.dish-option').forEach(el => el.classList.remove('selected'));
